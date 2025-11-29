@@ -25,6 +25,59 @@ H_o : \mu\_1 = \mu\_2 \ \text{vs.} \  H_1 : \mu\_1 \ne \mu\_2;\  \sigma^2_1 = \s
 $$
 
 ```{r}
+TEAM_ID <- 16
+ALPHA <- 0.05
+N1 <- 100
+N2 <- 50
+
+calculate_ak <- function(k, n) {
+  value <- k * log(k^2 * n + pi)
+  return(value - floor(value))
+}
+
+k_indices_X <- 1:N1
+k_indices_Y <- (N1 + 1):(N1 + N2)
+
+a_k_X <- sapply(k_indices_X, calculate_ak, n = TEAM_ID)
+a_k_Y <- sapply(k_indices_Y, calculate_ak, n = TEAM_ID)
+
+X <- qnorm(a_k_X)
+Y <- qnorm(a_k_Y)
+
+mean_X <- mean(X)
+var_X <- var(X)
+std_X <- sd(X)
+mean_Y <- mean(Y)
+var_Y <- var(Y)
+std_Y <- sd(Y)
+
+cat(sprintf("Sample X (N1=%d):\n", N1))
+cat(sprintf("Sample Mean (X̄): %.4f\n", mean_X))
+cat(sprintf("Sample Std Dev (S1): %.4f (S1^2: %.4f)\n", std_X, var_X))
+cat(sprintf("Sample Y (N2=%d):\n", N2))
+cat(sprintf("Sample Mean (Ȳ): %.4f\n", mean_Y))
+cat(sprintf("Sample Std Dev (S2): %.4f (S2^2: %.4f)\n", std_Y, var_Y))
+
+
+sigma_squared <- 1
+Z_statistic <- (mean_X - mean_Y) / sqrt(sigma_squared/N1 + sigma_squared/N2)
+
+Z_critical <- qnorm(1 - ALPHA / 2)
+
+p_value_Z <- 2 * (1 - pnorm(abs(Z_statistic)))
+
+reject_H0_Z <- p_value_Z < ALPHA
+
+cat(sprintf("\n1. Test Used: Z-test for the difference in means with known variances.\n"))
+cat(sprintf("2. Rejection Region for H0 (at %.2f level): |Z| > %.4f (Two-sided).\n", ALPHA, Z_critical))
+cat(sprintf("3. Calculated Test Statistic Z: %.4f\n", Z_statistic))
+cat(sprintf("4. p-value: %.4f\n", p_value_Z))
+cat(sprintf("5. Conclusion: "))
+cat(sprintf("Since p-value (%.4f) %s α (%.2f), we %s H0.\n", 
+            p_value_Z, 
+            ifelse(reject_H0_Z, "<", ">="), 
+            ALPHA, 
+            ifelse(reject_H0_Z, "REJECT", "DO NOT REJECT")))
 
 
 ```
@@ -36,7 +89,30 @@ H_o : \sigma_1 = \sigma_2 \ \text{vs.}\  H_1 : \sigma_1 > \sigma_2 \ \mu_1 = \mu
 $$
 
 ```{r}
+df1 <- N1 - 1 # Numerator degrees of freedom
+df2 <- N2 - 1 # Denominator degrees of freedom
 
+F_statistic <- var_X / var_Y
+
+# Rejection Region
+F_critical <- qf(1 - ALPHA, df1 = df1, df2 = df2)
+
+# Calculate p-value
+p_value_F <- 1 - pf(F_statistic, df1 = df1, df2 = df2)
+
+# Conclusion
+reject_H0_F <- p_value_F < ALPHA
+
+cat(sprintf("\n1. Test Used: F-test for variances (F-distribution).\n"))
+cat(sprintf("2. Rejection Region for H0 (at %.2f level): F > %.4f (Right-sided).\n", ALPHA, F_critical))
+cat(sprintf("3. Calculated Test Statistic F = %.4f\n", F_statistic))
+cat(sprintf("4. p-value: %.4f\n", p_value_F))
+cat(sprintf("5. Conclusion: "))
+cat(sprintf("Since p-value (%.4f) %s α (%.2f), we %s H0.\n", 
+            p_value_F, 
+            ifelse(reject_H0_F, "<", ">="), 
+            ALPHA, 
+            ifelse(reject_H0_F, "REJECT", "DO NOT REJECT")))
 ```
 
 ## Problem 3. Kolmogorov–Smirnov test
