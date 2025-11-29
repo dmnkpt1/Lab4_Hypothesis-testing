@@ -1,0 +1,50 @@
+---
+title: 'P&S-2025: Lab assignment 3'
+author: "Dominika Petrus, Anastasia Shopska, Stanistav Kovalenko"
+output:
+  html_document:
+    df_print: paged
+---
+
+**Work breakdown**
+
+-   Task 1:
+
+-   Task 2:
+
+-   Task 3:
+
+-   Task 4:
+
+Data was generated as:
+
+## Problem 1
+
+$$
+H_o : \mu\_1 = \mu\_2 \ \text{vs.} \  H_1 : \mu\_1 \ne \mu\_2;\  \sigma^2_1 = \sigma^2_2 = 1
+$$
+
+```{r}
+
+
+```
+
+## Problem 2
+
+$$
+H_o : \sigma_1 = \sigma_2 \ \text{vs.}\  H_1 : \sigma_1 > \sigma_2 \ \mu_1 = \mu_2 \ is \ known
+$$
+
+```{r}
+
+```
+
+## Problem 3. Kolmogorov–Smirnov test
+
+a.  $\{x_k\}^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample)
+
+b.  $\{|x_k|\}^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample)
+
+c.  $\{x_k\}^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample)
+
+## Problem 4
