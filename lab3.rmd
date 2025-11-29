@@ -117,10 +117,106 @@ cat(sprintf("Since p-value (%.4f) %s α (%.2f), we %s H0.\n",
 
 ## Problem 3. Kolmogorov–Smirnov test
 
-a.  $\{x_k\}^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample)
 
-b.  $\{|x_k|\}^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample)
 
-c.  $\{x_k\}^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample)
+### The main idea behind the KS test
 
+If we have data with unknown distribution we can test if our data fits to some known distribution (like normal, exp ..) using Kolmogorov’s Goodness-of-fit test (for 1 sample) or KS (for 2 sample) test, Kolmogorov’s Goodness-of-fit test use the fact that by LLN the empirical c.d.f. is close to theoretical . And assume these hypotheses: $$
+H_o : F = F_0 \ vs \ H_1 : F \ne F_0
+$$
+
+where F is distribution of our data and $F_0$ hypothetical, and test statistic as: $$
+d := \sup_{t \in \mathbb{R}} \left| \widehat{F}_x(t) - F_0(t) \right|
+$$ And rejection region: $$C_\alpha = \{x \in \mathbb{R}^n |\ d \ge d^n_{1-\alpha} \}$$
+
+While Kolmogorov-Smirnov we use to test if 2 samples have same distribution, it differs from previous in a way that we use max difference between two e.c.d.f with statistic: $$
+d := \sup_{t \in \mathbb{R}} \left| \widehat{F}_x(t) - \widehat{F}_y(t) \right|
+$$
+
+and hypotheses:
+
+$$
+H_o : F_x = F_y \ vs \ H_1 : F_x \ne F_y
+$$
+
+
+## Part a
+
+In this part (and next one) we will apply Kolmogorov’s Goodness-of-fit test.
+
+$\{x_k\}^{100}_{k=1}$ are normally distributed (with parameters calculated from the sample)
+
+```{r}
+
+x_data <- X
+y_data <- Y
+mean_of_a <- mean(x_data)
+variance_of_a <- var(x_data)
+
+test_x_is_normal <- ks.test(x_data, "pnorm", mean = mean_of_a, sd = sqrt(variance_of_a))
+
+cat("Results of testing if our data are normally distributed", "\n")
+print(test_x_is_normal)
+
+```
+
+
+Our p-value is equal to 0.9774, this mean that we cannot reject $H_0$ because our be value is bigger than 0.05 and that our data is distributed almost normal. We can see it on a plot:
+
+```{r}
+hist(x_data, freq = FALSE, col = "pink", ylim = c(0, 0.5))
+
+curve(dnorm(x, mean = mean(x_data), sd = sd(x_data)), 
+      col = "blue", add = TRUE)
+```
+
+## Part b
+
+$\{|x_k|\}^{100}_{k=1}$ are exponentially distributed with $\lambda$ = 1
+
+The difference now is that we take module of our data and test if it is exponentially distributed
+
+```{r}
+
+data_x_in_module <- abs(x_data)
+lambda <- 1
+
+test_module_x_is_exponential <- ks.test(x_data, "pexp", rate = lambda)
+cat("Results of testing if data in module are exponentially distributed with rate of", "\n")
+print(test_module_x_is_exponential)
+```
+
+
+Our p-value is equal to 2.2e-16, and this is very small value of p and means that we need to reject $H_0$ and our data is not exponentially distributed. Here is a plot:
+
+```{r}
+hist(data_x_in_module, freq = FALSE, breaks = 15, col = "purple",)
+
+curve(dexp(x, rate = 1), 
+      col = "blue", add = TRUE)
+```
+
+After observing it, it looks strange that we reject the null hypothesis, but we can see that distribution of our data falls faster (in the tail) while exponential stays over it
+
+## Part c
+
+$\{x_k\}^{100}_{k=1}$ and $\{y_l\}^{50}_{l=1}$ have the same distributions
+
+(Here we need to apply Kolmogorov-Smirnov test because we have two samples)
+
+```{r}
+
+test_x_same_as_y <- ks.test(x_data, y_data)
+
+cat("Results of testing if x has same distribution as y", "\n")
+print(test_x_same_as_y)
+
+```
+
+We can see that p-value for this case is equal to 0.3503 what mean that we do not reject $H_0$ and our samples have same distribution. And here is a plot where we see that null hyp. is actually true
+
+```{r}
+plot(ecdf(x_data), col = "pink")
+plot(ecdf(y_data), col = "blue",  add = TRUE)
+```
 ## Problem 4
